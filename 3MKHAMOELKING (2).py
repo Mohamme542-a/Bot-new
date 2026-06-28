@@ -392,7 +392,6 @@ crapi = CRAPI()
 # 🗄️ دوال قاعدة البيانات
 # ======================
 def init_db():
-    # تم إزالة مجلد app وجعل المسار نظيفاً بدون أخطاء صلاحيات
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     cursor.execute('''
@@ -401,8 +400,9 @@ def init_db():
             timestamp TEXT
         )
     ''')
+    # 🟢 تم تعديل الاسم هنا ليصبح bot_settings بدلاً من settings ليطابق كود الفحص الخاص بك
     cursor.execute('''
-        CREATE TABLE IF NOT EXISTS settings (
+        CREATE TABLE IF NOT EXISTS bot_settings (
             key TEXT PRIMARY KEY,
             value TEXT
         )
