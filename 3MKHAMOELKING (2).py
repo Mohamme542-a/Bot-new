@@ -394,7 +394,7 @@ crapi = CRAPI()
 def init_db():
     # ⚠️ التأكد من وجود مجلد /app
     if not os.path.exists('/app'):
-        os.makedirs('/app', exist_ok=True)
+        #os.makedirs('/app', exist_ok=True)
     
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
