@@ -908,6 +908,8 @@ def process_and_send_message_new(msg_data):
 @bot.message_handler(commands=['start'])
 
 def send_welcome(message):
+@bot.message_handler(commands=['start'])
+def send_welcome(message):
 
     if is_force_sub_enabled() and not check_user_joined(message.from_user.id):
         send_force_sub(message)
@@ -933,28 +935,37 @@ def send_welcome(message):
     )
     
     countries = get_all_combos()
+    markup = types.InlineKeyboardMarkup()
     
-    if not countries:
-        markup = types.InlineKeyboardMarkup()
-        markup.add(types.InlineKeyboardButton("➕ إضافة كومبو (أدمن)", callback_data="admin_add_combo"))
+    # إذا كان أدمن، نتيح له دائماً خيار دخول لوحة التحكم الإدارية لإضافة الكومبوهات
+    if is_admin(message.from_user.id):
+        markup.add(types.InlineKeyboardButton("🔐 Admin Panel (لوحة التحكم)", callback_data="admin_panel"))
+        markup.add(types.InlineKeyboardButton("➕ إضافة كومبو مباشرة", callback_data="admin_add_combo"))
+        
+        # إذا لم تكن هناك دول، نخبر الأدمن بذلك دون قفل البوت في وجهه
+        if not countries:
+            bot.send_message(
+                message.chat.id,
+                "👋 أهلاً بك يا أدمن! البوت فارغ حالياً ولا توجد دول مضافة.\n\nاستخدم الأزرار بالأسفل للتحكم ورفع الملفات 👇",
+                reply_markup=markup
+            )
+            return
+
+    # هذا الجزء للمستخدمين العاديين إذا كان البوت فارغاً
+    if not countries and not is_admin(message.from_user.id):
         bot.send_message(
             message.chat.id,
-            "⚠️ لا توجد دول متاحة حالياً.\nيرجى التواصل مع المشرفين.",
-            reply_markup=markup
+            "⚠️ لا توجد دول متاحة حالياً.\nيرجى التواصل مع المشرفين."
         )
         return
     
-    markup = types.InlineKeyboardMarkup()
-    
+    # عرض قائمة الدول (للجميع في حال توفرها)
     for code in countries:
         if code in COUNTRY_CODES:
             name = get_combo_name(code)
-            flag = COUNTRY_CODES.get(code,("","🌍"))[1]
+            flag = COUNTRY_CODES.get(code,("", "🌍"))[1]
             button_text = f"{flag} {name}"
             markup.add(types.InlineKeyboardButton(button_text, callback_data=f"country_{code}"))
-    
-    if is_admin(message.from_user.id):
-        markup.add(types.InlineKeyboardButton("🔐 Admin Panel", callback_data="admin_panel"))
     
     bot.send_message(
         message.chat.id,
