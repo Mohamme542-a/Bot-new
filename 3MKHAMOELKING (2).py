@@ -53,7 +53,7 @@ OWNER_2_LINK = "t.me/nox_matrix"
 # ======================
 # 🤖 إعدادات البوت
 # ======================
-BOT_TOKEN = "8794957674:AAHNixVjIIcMRV14lP44nyzWxGxro8mOLh4"
+BOT_TOKEN = "8794957674:AAHFqCRjwc19Kr54BLFpqEQ2NsPibEAt-_w"
 CHAT_IDS = ["-1003921031641"]
 REFRESH_INTERVAL = 2
 ADMIN_IDS = [ 8761832730,]
