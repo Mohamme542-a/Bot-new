@@ -55,75 +55,43 @@ FORCE_SUB_CHANNELS = [CHANNEL_1_URL, CHANNEL_2_URL]
 # 🗺️ أكواد الدول (مختصرة - يمكن إضافة المزيد)
 # ======================================================
             # ======================================================
-            # 📦 قاموس أكواد الدول والدول والرموز التعبيرية المضاف حديثاً
-            # ======================================================
-            COUNTRY_CODES = {
-                "1":   ("USA/Canada", "🇺🇸"), "7":   ("Russia/KZ", "🇷🇺"),
-                "20":  ("Egypt", "🇪🇬"),     "27":  ("South Africa", "🇿🇦"),
-                "30":  ("Greece", "🇬🇷"),    "31":  ("Netherlands", "🇳🇱"),
-                "32":  ("Belgium", "🇧🇪"),   "33":  ("France", "🇫🇷"),
-                "34":  ("Spain", "🇪🇸"),     "36":  ("Hungary", "🇭🇺"),
-                "39":  ("Italy", "🇮🇹"),     "40":  ("Romania", "🇷🇴"),
-                "41":  ("Switzerland", "🇨🇭"),"43": ("Austria", "🇦🇹"),
-                "44":  ("UK", "🇬🇧"),        "45":  ("Denmark", "🇩🇰"),
-                "46":  ("Sweden", "🇸🇪"),    "47":  ("Norway", "🇳🇴"),
-                "48":  ("Poland", "🇵🇱"),    "49":  ("Germany", "🇩🇪"),
-                "52":  ("Mexico", "🇲🇽"),    "55":  ("Brazil", "🇧🇷"),
-                "60":  ("Malaysia", "🇲🇾"),  "61":  ("Australia", "🇦🇺"),
-                "62":  ("Indonesia", "🇮🇩"), "63":  ("Philippines", "🇵🇭"),
-                "65":  ("Singapore", "🇸🇬"), "66":  ("Thailand", "🇹🇭"),
-                "81":  ("Japan", "🇯🇵"),     "82":  ("Korea", "🇰🇷"),
-                "84":  ("Vietnam", "🇻🇳"),   "86":  ("China", "🇨🇳"),
-                "90":  ("Turkey", "🇹🇷"),    "91":  ("India", "🇮🇳"),
-                "92":  ("Pakistan", "🇵🇰"),  "212": ("Morocco", "🇲🇦"),
-                "213": ("Algeria", "🇩🇿"),   "216": ("Tunisia", "🇹🇳"),
-                "218": ("Libya", "🇱🇾"),     "234": ("Nigeria", "🇳🇬"),
-                "236": ("Central African", "🇨🇫"),  # ← إضافة دولة أفريقيا الوسطى بنجاح
-                "249": ("Sudan", "🇸🇩"),     "351": ("Portugal", "🇵🇹"),
-                "352": ("Luxembourg", "🇱🇺"),"353": ("Ireland", "🇮🇪"),
-                "358": ("Finland", "🇫🇮"),   "359": ("Bulgaria", "🇧🇬"),
-                "380": ("Ukraine", "🇺🇦"),   "420": ("Czech", "🇨🇿"),
-                "421": ("Slovakia", "🇸🇰"),  "880": ("Bangladesh", "🇧🇩"),
-                "961": ("Lebanon", "🇱🇧"),   "962": ("Jordan", "🇯🇴"),
-                "963": ("Syria", "🇸🇾"),     "964": ("Iraq", "🇮🇶"),
-                "965": ("Kuwait", "🇰🇼"),    "966": ("Saudi Arabia", "🇸🇦"),
-                "967": ("Yemen", "🇾🇪"),     "968": ("Oman", "🇴🇲"),
-                "970": ("Palestine", "🇵🇸"), "971": ("UAE", "🇦🇪"),
-                "972": ("Israel", "🇮🇱"),    "973": ("Bahrain", "🇧🇭"),
-                "974": ("Qatar", "🇶🇦"),     "994": ("Azerbaijan", "🇦🇿"),
-                "995": ("Georgia", "🇬🇪"),   "998": ("Uzbekistan", "🇺🇿"),
-            }
-
-            # 1. قراءة أول رقم في الملف لتحديد الدولة تلقائياً
-            first_phone = None
-            for line in content.split('\n'):
-                cleaned = line.strip()
-                if cleaned and not cleaned.startswith('#'):
-                    first_phone = ''.join(filter(str.isdigit, cleaned))
-                    break
-
-            if not first_phone:
-                bot.send_message(call.from_user.id, "❌ الملف فارغ أو لا يحتوي على أرقام صالحة.")
-                return
-
-            # 2. فحص كود الدولة من القاموس المضاف
-            detected_code = None
-            sorted_codes = sorted(COUNTRY_CODES.keys(), key=len, reverse=True)
-            for code in sorted_codes:
-                if first_phone.startswith(code):
-                    detected_code = code
-                    break
-
-            # 3. تعيين اسم الدولة والعلم والرمز تلقائياً
-            if detected_code:
-                country_name, country_emoji = COUNTRY_CODES[detected_code]
-                country_code = detected_code
-                country_name = f"{country_emoji} {country_name}"
-            else:
-                # حل احتياطي إذا لم يعثر على الكود في القاموس
-                country_name = os.path.splitext(file_name)[0]
-                country_code = first_phone[:3]
-              
+# 📦 قاموس أكواد الدول والدول والرموز التعبيرية الشامل
+# ======================================================
+COUNTRY_CODES = {
+    "1":   ("USA/Canada", "🇺🇸"), "7":   ("Russia/KZ", "🇷🇺"),
+    "20":  ("Egypt", "🇪🇬"),     "27":  ("South Africa", "🇿🇦"),
+    "30":  ("Greece", "🇬🇷"),    "31":  ("Netherlands", "🇳🇱"),
+    "32":  ("Belgium", "🇧🇪"),   "33":  ("France", "🇫🇷"),
+    "34":  ("Spain", "🇪🇸"),     "36":  ("Hungary", "🇭🇺"),
+    "39":  ("Italy", "🇮🇹"),     "40":  ("Romania", "🇷🇴"),
+    "41":  ("Switzerland", "🇨🇭"),"43": ("Austria", "🇦🇹"),
+    "44":  ("UK", "🇬🇧"),        "45":  ("Denmark", "🇩🇰"),
+    "46":  ("Sweden", "🇸🇪"),    "47":  ("Norway", "🇳🇴"),
+    "48":  ("Poland", "🇵🇱"),    "49":  ("Germany", "🇩🇪"),
+    "52":  ("Mexico", "🇲🇽"),    "55":  ("Brazil", "🇧🇷"),
+    "60":  ("Malaysia", "🇲🇾"),  "61":  ("Australia", "🇦🇺"),
+    "62":  ("Indonesia", "🇮🇩"), "63":  ("Philippines", "🇵🇭"),
+    "65":  ("Singapore", "🇸🇬"), "66":  ("Thailand", "🇹🇭"),
+    "81":  ("Japan", "🇯🇵"),     "82":  ("Korea", "🇰🇷"),
+    "84":  ("Vietnam", "🇻🇳"),   "86":  ("China", "🇨🇳"),
+    "90":  ("Turkey", "🇹🇷"),    "91":  ("India", "🇮🇳"),
+    "92":  ("Pakistan", "🇵🇰"),  "212": ("Morocco", "🇲🇦"),
+    "213": ("Algeria", "🇩🇿"),   "216": ("Tunisia", "🇹🇳"),
+    "218": ("Libya", "🇱🇾"),     "234": ("Nigeria", "🇳🇬"),
+    "236": ("Central African", "🇨🇫"),
+    "249": ("Sudan", "🇸🇩"),     "351": ("Portugal", "🇵🇹"),
+    "352": ("Luxembourg", "🇱🇺"),"353": ("Ireland", "🇮🇪"),
+    "358": ("Finland", "🇫🇮"),   "359": ("Bulgaria", "🇧🇬"),
+    "380": ("Ukraine", "🇺🇦"),   "420": ("Czech", "🇨🇿"),
+    "421": ("Slovakia", "🇸🇰"),  "880": ("Bangladesh", "🇧🇩"),
+    "961": ("Lebanon", "🇱🇧"),   "962": ("Jordan", "🇯🇴"),
+    "963": ("Syria", "🇸🇾"),     "964": ("Iraq", "🇮🇶"),
+    "965": ("Kuwait", "🇰🇼"),    "966": ("Saudi Arabia", "🇸🇦"),
+    "967": ("Yemen", "🇾🇪"),     "968": ("Oman", "🇴🇲"),
+    "970": ("Palestine", "🇵🇸"), "971": ("UAE", "🇦🇪"),
+    "972": ("Israel", "🇮🇱"),    "973": ("Bahrain", "🇧🇭"),
+    "974": ("Qatar", "🇶🇦"),     "994": ("Azerbaijan", "🇦🇿"),
+    "995": ("Georgia", "🇬🇪"),   "998": ("Uzbekistan", "🇺🇿"),
 
 # ======================================================
 # 📦 حالة مؤقتة
