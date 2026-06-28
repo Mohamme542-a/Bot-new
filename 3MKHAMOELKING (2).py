@@ -58,7 +58,7 @@ CHAT_IDS = ["-1003921031641"]
 REFRESH_INTERVAL = 2
 ADMIN_IDS = [ 8761832730,]
 OWNER_ID = 8761832730
-DB_PATH = "/app/bot.db"
+DB_PATH = "bot.db"
 
 # ======================
 # 🗺️ أكواد الدول المحدثة
