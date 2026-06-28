@@ -904,10 +904,6 @@ def process_and_send_message_new(msg_data):
 # ======================
 # 🎮 أوامر البوت
 # ======================
-
-@bot.message_handler(commands=['start'])
-
-def send_welcome(message):
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
 
