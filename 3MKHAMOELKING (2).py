@@ -392,74 +392,27 @@ crapi = CRAPI()
 # 🗄️ دوال قاعدة البيانات
 # ======================
 def init_db():
-    # ⚠️ التأكد من وجود مجلد /app
-    if not os.path.exists('/app'):
-        #os.makedirs('/app', exist_ok=True)
-    
+    # تم إزالة مجلد app وجعل المسار نظيفاً بدون أخطاء صلاحيات
     conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS users (
-            user_id INTEGER PRIMARY KEY,
-            username TEXT,
-            first_name TEXT,
-            last_name TEXT,
-            country_code TEXT,
-            assigned_number TEXT,
-            is_banned INTEGER DEFAULT 0,
-            private_combo_country TEXT DEFAULT NULL
-        )
-    ''')
-    
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS combos (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            country_code TEXT UNIQUE,
-            custom_name TEXT,
-            numbers TEXT
-        )
-    ''')
-    
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS otp_logs (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            dt TEXT,
-            num TEXT,
-            cli TEXT,
-            message TEXT,
-            otp TEXT,
-            country TEXT,
-            service TEXT,
-            sent_to_user INTEGER,
-            sent_to_group INTEGER,
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS sent_messages (
+            id TEXT PRIMARY KEY,
             timestamp TEXT
         )
     ''')
-    
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS bot_settings (
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS settings (
             key TEXT PRIMARY KEY,
             value TEXT
         )
     ''')
-    
-    settings = [
-        ('channel_1', CHANNEL_1_URL),
-        ('channel_2', CHANNEL_2_URL),
-        ('owner_1', OWNER_1_LINK),
-        ('owner_2', OWNER_2_LINK)
-    ]
-    
-    for key, value in settings:
-        c.execute("INSERT OR IGNORE INTO bot_settings (key, value) VALUES (?, ?)", (key, value))
-
-    # تأكد من وجود عمود اسم الرينج
-    try:
-        c.execute("ALTER TABLE combos ADD COLUMN custom_name TEXT")
-    except:
-        pass
-
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS ranges (
+            code TEXT PRIMARY KEY,
+            name TEXT
+        )
+    ''')
     conn.commit()
     conn.close()
 
