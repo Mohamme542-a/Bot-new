@@ -394,25 +394,41 @@ crapi = CRAPI()
 def init_db():
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
+    
+    # 1. جدول الرسائل المرسلة
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS sent_messages (
             id TEXT PRIMARY KEY,
             timestamp TEXT
         )
     ''')
-    # 🟢 تم تعديل الاسم هنا ليصبح bot_settings بدلاً من settings ليطابق كود الفحص الخاص بك
+    
+    # 2. جدول إعدادات البوت
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS bot_settings (
             key TEXT PRIMARY KEY,
             value TEXT
         )
     ''')
+    
+    # 3. جدول النطاقات
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS ranges (
             code TEXT PRIMARY KEY,
             name TEXT
         )
     ''')
+    
+    # 4. 🟢 الجدول الناقص الذي تسبب بالخطأ الحالي (جدول المستخدمين والحظر)
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS users (
+            user_id INTEGER PRIMARY KEY,
+            username TEXT,
+            is_banned INTEGER DEFAULT 0,
+            join_date TEXT
+        )
+    ''')
+    
     conn.commit()
     conn.close()
 
