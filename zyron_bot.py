@@ -48,7 +48,7 @@ CHANNEL_1_URL = "https://t.me/gvbhvc669"
 CHANNEL_2_URL = "https://t.me/fhbcf5888"
 OWNER_1_LINK  = "https://t.me/nox_matrix"
 OWNER_2_LINK  = "https://t.me/nox_matrix"
-OTP_GROUP_LINK = "https://t.me/tttttbgg"
+OTP_GROUP_LINK = "https://t.me/+IaUh8c8vXnIzYTM0"
 FORCE_SUB_CHANNELS = [CHANNEL_1_URL, CHANNEL_2_URL]
 
 # ======================================================
