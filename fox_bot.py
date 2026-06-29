@@ -45,12 +45,12 @@ from telebot import types
 # ============================================================
 # CONFIG  — غيّر هذه القيم فقط
 # ============================================================
-BOT_TOKEN      = "PUT_YOUR_TELEGRAM_BOT_TOKEN_HERE"
-ADMIN_IDS      = [123456789]               # ضع آيدي الأدمن(ات)
+BOT_TOKEN      = "8794957674:AAHzev14d5JM7F3IpOQaCn-J_hRNSuGVrn8"
+ADMIN_IDS      = [8761832730]               # ضع آيدي الأدمن(ات)
 SITE_BASE      = "http://151.80.19.204/ints"
 SITE_USERNAME  = "Hama11"
 SITE_PASSWORD  = "Hama11"
-GROUP_LINK     = "https://t.me/your_group"  # رابط مجموعة OTPL
+GROUP_LINK     = "https://t.me/+IaUh8c8vXnIzYTM0" # رابط مجموعة OTPL
 REWARD_PER_OTP = 0.0030
 NUMBERS_PER_REQUEST = 4                    # كم رقم يُعطى للمستخدم بكل طلب
 FETCH_INTERVAL = 8                         # ثواني بين كل سحب من الموقع
