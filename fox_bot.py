@@ -310,7 +310,7 @@ class Panel:
         self.lock = threading.Lock()
 
     @staticmethod
-    def _solve_math(text):  # <--- لاحظ: لا توجد مسافات بادئة قبل def
+    def _solve_math(text):
         """حل كابتشا حسابية مثل: What is 3 + 4 = ? أو 5 - 2"""
         m = re.search(r"(\d+)\s*([\+\-\*xX×])\s*(\d+)", text or "")
         if not m: return None
@@ -321,31 +321,48 @@ class Panel:
         return None
 
     def login(self):
-    with self.lock:
+        with self.lock:   # <--- لاحظ المسافات هنا (4 مسافات بداية السطر)
+            try:
+                login_url = self.base + self.LOGIN_PATH
+                r = self.s.get(login_url, timeout=20)
+                soup = BeautifulSoup(r.text, "lxml")
+                token = ""
+                t = soup.find("input", {"name": "_token"})
+                if t:
+                    token = t.get("value", "")
+                
+                capt = self._solve_math(soup.get_text(" ", strip=True))
+                data = {"_token": token, "email": self.user, "password": self.pwd}
+                
+                if capt is not None:
+                    data["capt"] = str(capt)
+                    data["captcha"] = str(capt)
+                
+                r2 = self.s.post(login_url, data=data, timeout=20, allow_redirects=True)
+                self.logged_in = ("logout" in r2.text.lower()) or (r2.url.endswith("/portal") or "dashboard" in r2.url.lower())
+                log.info("Panel login: %s", "OK" if self.logged_in else "FAILED")
+                return self.logged_in
+            except Exception as e:
+                log.error("Panel login error: %s", e)
+                self.logged_in = False
+                return False
+
+    def fetch_sms(self):
+        """Get latest SMS rows from data_smscdr.php style endpoint."""
+        if not self.logged_in and not self.login(): return []
         try:
-            login_url = self.base + self.LOGIN_PATH
-            r = self.s.get(login_url, timeout=20)
-            soup = BeautifulSoup(r.text, "lxml")
-            token = ""
-            t = soup.find("input", {"name": "_token"})
-            if t:
-                token = t.get("value", "")
-            
-            capt = self._solve_math(soup.get_text(" ", strip=True))
-            data = {"_token": token, "email": self.user, "password": self.pwd}
-            
-            if capt is not None:
-                data["capt"] = str(capt)
-                data["captcha"] = str(capt)
-            
-            r2 = self.s.post(login_url, data=data, timeout=20, allow_redirects=True)
-            self.logged_in = ("logout" in r2.text.lower()) or (r2.url.endswith("/portal") or "dashboard" in r2.url.lower())
-            log.info("Panel login: %s", "OK" if self.logged_in else "FAILED")
-            return self.logged_in
+            url = f"{PANEL_URL}/portal/sms/received/getsms"
+            today = datetime.utcnow().strftime("%Y-%m-%d")
+            r = self.s.post(url, data={"fdate1": today, "fdate2": today}, timeout=20,
+                headers={"Referer": f"{PANEL_URL}/portal/sms/received",
+                         "X-Requested-With": "XMLHttpRequest"})
+            if r.status_code in (401, 403) or "login" in r.url.lower():
+                self.logged_in = False; self.login(); return []
+            try:    data = r.json()
+            except: data = []
+            return data if isinstance(data, list) else data.get("aaData", [])
         except Exception as e:
-            log.error("Panel login error: %s", e)
-            self.logged_in = False
-            return False
+            log.warning("fetch_sms err: %s", e); return []
     def fetch_sms(self):
         """Get latest SMS rows from data_smscdr.php style endpoint."""
         if not self.logged_in and not self.login(): return []
