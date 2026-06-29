@@ -291,25 +291,29 @@ def is_banned(uid):
 # ============================================================
 class Panel:
     def __init__(self):
-        self.s = requests.Session()
-        self.s.headers.update({
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                          "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36",
-            "Accept-Language": "en-US,en;q=0.9",
-        })
-        self.lock = threading.Lock()
-        self.logged_in = False
-      
-            @staticmethod
-    def _solve_math(text):
-        """حل كابتشا حسابية مثل: What is 3 + 4 = ? أو 5 - 2"""
-        m = re.search(r"(\d+)\s*([\+\-\*xX×])\s*(\d+)", text or "")
-        if not m: return None
-        a, op, b = int(m.group(1)), m.group(2), int(m.group(3))
-        if op == "+": return a + b
-        if op == "-": return a - b
-        if op in ("*", "x", "X", "×"): return a * b
+    self.s = requests.Session()
+    self.s.headers.update({
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                      "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36",
+        "Accept-Language": "en-US,en;q=0.9",
+    })
+    self.lock = threading.Lock()
+    self.logged_in = False
+
+@staticmethod  # <--- لا تضع مسافات هنا، يجب أن يكون على نفس مستوى def __init__
+def _solve_math(text):
+    """حل كابتشا حسابية مثل: What is 3 + 4 = ? أو 5 - 2"""
+    m = re.search(r"(\d+)\s*([\+\-\*xX×])\s*(\d+)", text or "")
+    if not m: 
         return None
+    a, op, b = int(m.group(1)), m.group(2), int(m.group(3))
+    if op == "+": 
+        return a + b
+    if op == "-": 
+        return a - b
+    if op in ("*", "x", "X", "×"): 
+        return a * b
+    return None
 
     def login(self):
         with self.lock:
