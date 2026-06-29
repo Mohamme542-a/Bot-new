@@ -300,26 +300,15 @@ class Panel:
         self.lock = threading.Lock()
         self.logged_in = False
       
-        def _solve_math(self, text: str) -> Optional[int]:
-        """يحل الكابتشا الحسابية من النص تلقائياً ويغطي كافة الرموز الممكنة"""
-        if not text:
-            return None
-        # تنظيف النص وتحويل علامات الضرب المختلفة إلى نجمة * لسهولة الحساب
-        text = text.replace("×", "*").replace("x", "*").replace("X", "*")
-        # البحث عن نمط رقم ثم علامة حسابية ثم رقم آخر
-        m = re.search(r"(\d+)\s*([\+\-\*\/])\s*(\d+)", text)
-        if not m:
-            return None
-        try:
-            a = int(m.group(1))
-            op = m.group(2)
-            b = int(m.group(3))
-            if op == "+": return a + b
-            if op == "-": return a - b
-            if op == "*": return a * b
-            if op == "/": return a // b if b != 0 else None
-        except Exception:
-            pass
+            @staticmethod
+    def _solve_math(text):
+        """حل كابتشا حسابية مثل: What is 3 + 4 = ? أو 5 - 2"""
+        m = re.search(r"(\d+)\s*([\+\-\*xX×])\s*(\d+)", text or "")
+        if not m: return None
+        a, op, b = int(m.group(1)), m.group(2), int(m.group(3))
+        if op == "+": return a + b
+        if op == "-": return a - b
+        if op in ("*", "x", "X", "×"): return a * b
         return None
 
     def login(self):
