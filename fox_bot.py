@@ -290,32 +290,38 @@ def is_banned(uid):
 #                  PANEL CLIENT (Zyron / IVASMS)
 # ============================================================
 class Panel:
-    def __init__(self):
-    self.s = requests.Session()
-    self.s.headers.update({
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                      "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36",
-        "Accept-Language": "en-US,en;q=0.9",
-    })
-    self.lock = threading.Lock()
-    self.logged_in = False
+    """عميل لوحة Zyron - يحل الكابتشا الحسابي تلقائياً."""
+    LOGIN_PATH = "/login"
+    SIGNIN_PATH = "/signin"
+    STATS_PATH = "/agent/SMSCDRStats"
+    DATA_PATH  = "/agent/res/data_smscdr.php"
 
-@staticmethod  # <--- لا تضع مسافات هنا، يجب أن يكون على نفس مستوى def __init__
-def _solve_math(text):
-    """حل كابتشا حسابية مثل: What is 3 + 4 = ? أو 5 - 2"""
-    m = re.search(r"(\d+)\s*([\+\-\*xX×])\s*(\d+)", text or "")
-    if not m: 
+    def __init__(self, base, user, pwd):
+        self.base = base.rstrip("/")
+        self.user, self.pwd = user, pwd
+        self.s = requests.Session()
+        self.s.headers.update({
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                          "AppleWebKit/537.36 (KHTML, like Gecko) "
+                          "Chrome/124.0.0.0 Safari/537.36",
+            "Accept-Language": "en-US,en;q=0.9,ar;q=0.8",
+        })
+        self.logged_in = False
+        self.lock = threading.Lock()
+
+    @staticmethod
+    def _solve_math(text):  # <--- لاحظ: لا توجد مسافات بادئة قبل def
+        """حل كابتشا حسابية مثل: What is 3 + 4 = ? أو 5 - 2"""
+        m = re.search(r"(\d+)\s*([\+\-\*xX×])\s*(\d+)", text or "")
+        if not m: return None
+        a, op, b = int(m.group(1)), m.group(2), int(m.group(3))
+        if op == "+": return a + b
+        if op == "-": return a - b
+        if op in ("*", "x", "X", "×"): return a * b
         return None
-    a, op, b = int(m.group(1)), m.group(2), int(m.group(3))
-    if op == "+": 
-        return a + b
-    if op == "-": 
-        return a - b
-    if op in ("*", "x", "X", "×"): 
-        return a * b
-    return None
 
     def login(self):
+        # ... باقي الكود كما هو ...
         with self.lock:
             try:
                 r = self.s.get(f"{PANEL_URL}/login", timeout=20)
