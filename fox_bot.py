@@ -290,11 +290,10 @@ def is_banned(uid):
 #                  PANEL CLIENT (Zyron / IVASMS)
 # ============================================================
 class Panel:
-    """عميل لوحة Zyron - يحل الكابتشا الحسابي تلقائياً."""
-    LOGIN_PATH = "/login"
-    SIGNIN_PATH = "/signin"
-    STATS_PATH = "/agent/SMSCDRStats"
-    DATA_PATH  = "/agent/res/data_smscdr.php"
+    """عميل لوحة Zyron - تم إصلاح الروابط والهيدرز بناءً على كود HTML الخاص بالمستخدم."""
+    LOGIN_URL = "/signin"          # <--- تم التصحيح هنا (action='signin')
+    STATS_URL = "/agent/SMSCDRStats"
+    DATA_URL  = "/agent/res/data_smscdr.php"
 
     def __init__(self, base, user, pwd):
         self.base = base.rstrip("/")
@@ -321,25 +320,35 @@ class Panel:
         return None
 
     def login(self):
-        with self.lock:   # <--- لاحظ المسافات هنا (4 مسافات بداية السطر)
+        with self.lock:
             try:
-                login_url = self.base + self.LOGIN_PATH
-                r = self.s.get(login_url, timeout=20)
+                # 1. الحصول على صفحة الدخول لاستخراج توكن الحماية
+                login_page_url = self.base + "/login"
+                r = self.s.get(login_page_url, timeout=20)
                 soup = BeautifulSoup(r.text, "lxml")
                 token = ""
                 t = soup.find("input", {"name": "_token"})
                 if t:
                     token = t.get("value", "")
                 
+                # 2. حل الكابتشا الحسابي
                 capt = self._solve_math(soup.get_text(" ", strip=True))
-                data = {"_token": token, "email": self.user, "password": self.pwd}
                 
+                # 3. تجهيز بيانات الدخول (بناءً على كود HTML: username و password)
+                data = {
+                    "_token": token, 
+                    "username": self.user,  # <--- تم التصحيح (كانت email سابقاً)
+                    "password": self.pwd
+                }
                 if capt is not None:
                     data["capt"] = str(capt)
-                    data["captcha"] = str(capt)
                 
-                r2 = self.s.post(login_url, data=data, timeout=20, allow_redirects=True)
-                self.logged_in = ("logout" in r2.text.lower()) or (r2.url.endswith("/portal") or "dashboard" in r2.url.lower())
+                # 4. إرسال طلب تسجيل الدخول إلى المسار الصحيح (signin)
+                signin_url = self.base + self.LOGIN_URL
+                r2 = self.s.post(signin_url, data=data, timeout=30, allow_redirects=True)
+                
+                # 5. التحقق من نجاح الدخول
+                self.logged_in = ("logout" in r2.text.lower()) or (r2.url.endswith("/agent") or "dashboard" in r2.url.lower())
                 log.info("Panel login: %s", "OK" if self.logged_in else "FAILED")
                 return self.logged_in
             except Exception as e:
@@ -348,38 +357,48 @@ class Panel:
                 return False
 
     def fetch_sms(self):
-        """Get latest SMS rows from data_smscdr.php style endpoint."""
+        """Get latest SMS rows from data_smscdr.php using correct Headers & Referer."""
         if not self.logged_in and not self.login(): return []
         try:
-            url = f"{PANEL_URL}/portal/sms/received/getsms"
+            # إعداد الـ Headers المطلوبة لتجاوز حماية "Direct Script Access"
+            self.s.headers.update({
+                "Referer": self.base + self.STATS_URL,       # <--- مطلوب جداً لتجاوز الحماية
+                "X-Requested-With": "XMLHttpRequest"         # <--- مطلوب جداً لإيهام السيرفر بأنه طلب Ajax
+            })
+            
+            # الرابط الصحيح للبيانات
+            url = self.base + self.DATA_URL
             today = datetime.utcnow().strftime("%Y-%m-%d")
-            r = self.s.post(url, data={"fdate1": today, "fdate2": today}, timeout=20,
-                headers={"Referer": f"{PANEL_URL}/portal/sms/received",
-                         "X-Requested-With": "XMLHttpRequest"})
+            
+            # الباراميترات كما هي موجودة في كود الـ DataTables
+            params = {
+                "fdate1": f"{today} 00:00:00",
+                "fdate2": f"{today} 23:59:59",
+                "frange": "", "fclient": "", "fnum": "", "fcli": "",
+                "fgdate": "", "fgmonth": "", "fgrange": "",
+                "fgclient": "", "fgnumber": "", "fgcli": "", "fg": "0",
+                "iDisplayStart": 0,
+                "iDisplayLength": 100,
+            }
+            
+            r = self.s.get(url, params=params, timeout=30)
+            
+            # إذا طلب منا تسجيل الدخول مجدداً
             if r.status_code in (401, 403) or "login" in r.url.lower():
-                self.logged_in = False; self.login(); return []
-            try:    data = r.json()
-            except: data = []
+                self.logged_in = False
+                self.login()
+                return []
+                
+            try:
+                data = r.json()
+            except:
+                data = []
+                
             return data if isinstance(data, list) else data.get("aaData", [])
+            
         except Exception as e:
-            log.warning("fetch_sms err: %s", e); return []
-    def fetch_sms(self):
-        """Get latest SMS rows from data_smscdr.php style endpoint."""
-        if not self.logged_in and not self.login(): return []
-        try:
-            url = f"{PANEL_URL}/portal/sms/received/getsms"
-            today = datetime.utcnow().strftime("%Y-%m-%d")
-            r = self.s.post(url, data={"fdate1": today, "fdate2": today}, timeout=20,
-                headers={"Referer": f"{PANEL_URL}/portal/sms/received",
-                         "X-Requested-With": "XMLHttpRequest"})
-            if r.status_code in (401, 403) or "login" in r.url.lower():
-                self.logged_in = False; self.login(); return []
-            try:    data = r.json()
-            except: data = []
-            return data if isinstance(data, list) else data.get("aaData", [])
-        except Exception as e:
-            log.warning("fetch_sms err: %s", e); return []
-
+            log.warning("fetch_sms err: %s", e)
+            return []
 panel = Panel(PANEL_URL, PANEL_USER, PANEL_PASS)
 
 # ============================================================
