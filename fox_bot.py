@@ -358,7 +358,7 @@ class Panel:
         except Exception as e:
             log.warning("fetch_sms err: %s", e); return []
 
-panel = Panel()
+panel = Panel(PANEL_URL, PANEL_USER, PANEL_PASS)
 
 # ============================================================
 #                  OTP EXTRACTION
