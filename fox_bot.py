@@ -41,7 +41,7 @@ from telebot import types
 BOT_TOKEN   = os.getenv("BOT_TOKEN",   "8919284673:AAEsKk8mYpqS-NjHmARr5eX5KaCq95zzcFQ")
 ADMIN_IDS   = [int(x) for x in os.getenv("ADMIN_IDS", "8761832730").split(",") if x.strip()]
 
-PANEL_URL   = os.getenv("PANEL_URL",   "http://151.80.19.204/ints/login")  # or your Zyron URL
+PANEL_URL   = os.getenv("PANEL_URL",   "http://151.80.19.204/ints")  # تم حذف /login من النهاية
 PANEL_USER  = os.getenv("PANEL_USER",  "Hama11")
 PANEL_PASS  = os.getenv("PANEL_PASS",  "Hama11")
 
@@ -321,26 +321,28 @@ class Panel:
         return None
 
     def login(self):
-        # ... باقي الكود كما هو ...
-        with self.lock:
-            try:
-                r = self.s.get(f"{PANEL_URL}/login", timeout=20)
-                soup = BeautifulSoup(r.text, "lxml")
-                token = ""
-                t = soup.find("input", {"name": "_token"})
-                if t: token = t.get("value", "")
-                capt = self._solve_math(soup.get_text(" ", strip=True))
-                data = {"_token": token, "email": PANEL_USER, "password": PANEL_PASS}
-                if capt is not None: data["capt"] = str(capt); data["captcha"] = str(capt)
-                r2 = self.s.post(f"{PANEL_URL}/login", data=data, timeout=20, allow_redirects=True)
-                self.logged_in = ("logout" in r2.text.lower()) or (r2.url.endswith("/portal") or "dashboard" in r2.url.lower())
-                log.info("Panel login: %s", "OK" if self.logged_in else "FAILED")
-                return self.logged_in
-            except Exception as e:
-                log.error("Panel login error: %s", e)
-                self.logged_in = False
-                return False
-
+    with self.lock:
+        try:
+            login_url = self.base + self.LOGIN_PATH
+            r = self.s.get(login_url, timeout=20)
+            soup = BeautifulSoup(r.text, "lxml")
+            token = ""
+            t = soup.find("input", {"name": "_token"})
+            if t: token = t.get("value", "")
+            capt = self._solve_math(soup.get_text(" ", strip=True))
+            data = {"_token": token, "email": self.user, "password": self.pwd}
+            if capt is not None:
+                data["capt"] = str(capt)
+                data["captcha"] = str(capt)
+            r2 = self.s.post(login_url, data=data, timeout=20, allow_redirects=True)
+            self.logged_in = ("logout" in r2.text.lower()) or (r2.url.endswith("/portal") or "dashboard" in r2.url.lower())
+            log.info("Panel login: %s", "OK" if self.logged_in else "FAILED")
+            return self.logged_in
+        except Exception as e:
+            log.error("Panel login error: %s", e)
+            self.logged_in = False
+            return False
+          
     def fetch_sms(self):
         """Get latest SMS rows from data_smscdr.php style endpoint."""
         if not self.logged_in and not self.login(): return []
