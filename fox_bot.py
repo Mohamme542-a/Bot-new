@@ -328,7 +328,7 @@ class Panel:
             soup = BeautifulSoup(r.text, "lxml")
             token = ""
             t = soup.find("input", {"name": "_token"})
-            if t: 
+            if t:
                 token = t.get("value", "")
             
             capt = self._solve_math(soup.get_text(" ", strip=True))
@@ -346,7 +346,6 @@ class Panel:
             log.error("Panel login error: %s", e)
             self.logged_in = False
             return False
-          
     def fetch_sms(self):
         """Get latest SMS rows from data_smscdr.php style endpoint."""
         if not self.logged_in and not self.login(): return []
