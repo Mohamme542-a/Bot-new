@@ -299,8 +299,7 @@ class Panel:
         })
         self.lock = threading.Lock()
         self.logged_in = False
-
-    @staticmethod
+      
         def _solve_math(self, text: str) -> Optional[int]:
         """يحل الكابتشا الحسابية من النص تلقائياً ويغطي كافة الرموز الممكنة"""
         if not text:
