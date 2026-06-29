@@ -33,12 +33,12 @@ from flask import Flask, request, jsonify, Response
 # ============================================================
 # CONFIG
 # ============================================================
-BOT_TOKEN      = "PUT_YOUR_TELEGRAM_BOT_TOKEN_HERE"
-ADMIN_IDS      = [123456789]
+BOT_TOKEN      = "8794957674:AAHzev14d5JM7F3IpOQaCn-J_hRNSuGVrn8"
+ADMIN_IDS      = [8761832730]
 SITE_BASE      = "http://151.80.19.204/ints"
 SITE_USERNAME  = "Hama11"
 SITE_PASSWORD  = "Hama11"
-GROUP_LINK     = "https://t.me/your_group"
+GROUP_LINK     = "https://t.me/+IaUh8c8vXnIzYTM0"
 REWARD_PER_OTP = 0.0030
 NUMBERS_PER_REQUEST = 4
 FETCH_INTERVAL = 8
@@ -47,7 +47,7 @@ DB_PATH        = "fox_bot.db"
 # الويب أب — يجب أن يكون HTTPS عند النشر للتيليجرام
 WEB_HOST   = "0.0.0.0"
 WEB_PORT   = 8080
-WEBAPP_URL = "https://your-ngrok-or-domain.example.com"   # ← غيّره (https إلزامي)
+WEBAPP_URL = "https://bot-new-8zzw.onrender.com"   # ← غيّره (https إلزامي)
 
 WELCOME_STICKER_ID = "CAACAgIAAxkBAAEBQYZl4n5hWfQ"
 
