@@ -328,12 +328,16 @@ class Panel:
             soup = BeautifulSoup(r.text, "lxml")
             token = ""
             t = soup.find("input", {"name": "_token"})
-            if t: token = t.get("value", "")
+            if t: 
+                token = t.get("value", "")
+            
             capt = self._solve_math(soup.get_text(" ", strip=True))
             data = {"_token": token, "email": self.user, "password": self.pwd}
+            
             if capt is not None:
                 data["capt"] = str(capt)
                 data["captcha"] = str(capt)
+            
             r2 = self.s.post(login_url, data=data, timeout=20, allow_redirects=True)
             self.logged_in = ("logout" in r2.text.lower()) or (r2.url.endswith("/portal") or "dashboard" in r2.url.lower())
             log.info("Panel login: %s", "OK" if self.logged_in else "FAILED")
