@@ -20,7 +20,7 @@ API3_URL = "https://pscall.net/restapi/smsreport"
 API3_KEY = "SFNYSj1SS16DgYdyf4KIgA=="
 
 BOT_TOKEN   = "8907846587:AAHWEG-2zS8Kr1iTuulE0nYDhhvuDTcch1E"
-TARGET_CHAT = '-1003725814394'
+TARGET_CHAT = '-1003921031641'
 
 bot = Bot(token=BOT_TOKEN)
 
